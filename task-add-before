@@ -1,0 +1,25 @@
+# CHECK IT OUT
+#!/bin/sh
+set -ex
+set -o nounset
+set -u
+
+# Example: `task-add-before 4 Do the preparations`
+
+ID_OF_PARENT_TASK="$1"
+shift 1
+
+NEW_TASK_DESCRIPTION="$*" # rest of arguments
+
+NEW_TASK_CMDRESULT=$(task add "$NEW_TASK_DESCRIPTION")
+echo "$NEW_TASK_CMDRESULT"
+
+# Created task 6. #example
+NEW_TASK_ID=$(echo "$NEW_TASK_CMDRESULT" \
+  | grep "^Created task\ \d.\.$" \
+  | awk '{ print $3 }' \
+  | sed 's/[^0-9]//g')
+
+# New one has to be done first
+echo "$ID_OF_PARENT_TASK" will depend on "$NEW_TASK_ID"
+task "$ID_OF_PARENT_TASK" modify depends:"$NEW_TASK_ID"
