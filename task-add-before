@@ -1,17 +1,40 @@
-# CHECK IT OUT
 #!/bin/sh
 set -ex
 set -o nounset
 set -u
 
+# Requires jq, taskwarrior
 # Example: `task-add-before 4 Do the preparations`
 
 ID_OF_PARENT_TASK="$1"
 shift 1
 
+# PARENT_TASK_PROJECT=$(task "$ID_OF_PARENT_TASK" info | grep "Project\ \ \ \ \ \ \ " | awk '{print $2}')
+PARENT_TASK_PROJECT=$(task "$ID_OF_PARENT_TASK" export | jq -r '.[0].project')
+if [ -n "$PARENT_TASK_PROJECT" ]; then
+  PARENT_TASK_PROJECT="project:$PARENT_TASK_PROJECT";
+  else
+  PARENT_TASK_PROJECT=""
+fi
+
+PARENT_TASK_due=$(task "$ID_OF_PARENT_TASK" export | jq -r '.[0].due')
+if [ "$PARENT_TASK_due" != "null" ]; then
+  PARENT_TASK_due="due:$PARENT_TASK_due";
+  else
+  PARENT_TASK_due=""
+fi
+
+# # PARENT_TASK_TAGS=$(task "$ID_OF_PARENT_TASK" info | grep "Tags\ \ \ \ \ \ \ \ \ \ ")
+# PARENT_TASK_TAGS=$(task      "$ID_OF_PARENT_TASK" export | jq '.[0].tags | join(" ") | ""')
+# if [ -z "$PARENT_TASK_TAGS" ]
+# then
+# PARENT_TASK_TAGS="tags: $PARENT_TASK_TAGS"
+# fi
+
 NEW_TASK_DESCRIPTION="$*" # rest of arguments
 
-NEW_TASK_CMDRESULT=$(task add "$NEW_TASK_DESCRIPTION")
+# TODO REMOVE AND REPLACE WITH JSON
+NEW_TASK_CMDRESULT=$(task add $NEW_TASK_DESCRIPTION $PARENT_TASK_PROJECT $PARENT_TASK_due)
 echo "$NEW_TASK_CMDRESULT"
 
 # Created task 6. #example
