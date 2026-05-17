@@ -14,11 +14,19 @@
     {
       packages = forAllSystems (system:
         let pkgs = nixpkgs.legacyPackages.${system}; in {
-          default = pkgs.writeShellApplication {
-            name = "task-add-before";
-            runtimeInputs = [ pkgs.jq pkgs.taskwarrior2 ];
-            text = builtins.readFile ./task-add-before;
-          };
+          default =
+            let
+              script = pkgs.writeScriptBin "task-add-before" (builtins.readFile ./task-add-before);
+            in
+            pkgs.symlinkJoin {
+              name = "task-add-before";
+              paths = [ script ];
+              buildInputs = [ pkgs.makeWrapper ];
+              postBuild = ''
+                wrapProgram $out/bin/task-add-before \
+                  --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.jq pkgs.taskwarrior2 ]}
+              '';
+            };
         });
 
       overlays.default = final: prev: {
