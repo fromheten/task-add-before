@@ -34,15 +34,11 @@ fi
 
 NEW_TASK_DESCRIPTION="$*" # rest of arguments
 
-# TODO REMOVE AND REPLACE WITH JSON
 NEW_TASK_CMDRESULT=$(task add $NEW_TASK_DESCRIPTION $PARENT_TASK_PROJECT $PARENT_TASK_due)
 echo "$NEW_TASK_CMDRESULT"
 
 # Created task 6. #example
-NEW_TASK_ID=$(echo "$NEW_TASK_CMDRESULT" \
-  | grep "^Created task\ \d.\.$" \
-  | awk '{ print $3 }' \
-  | sed 's/[^0-9]//g')
+NEW_TASK_ID=$(printf '%s' "$NEW_TASK_CMDRESULT" | sed -n 's/^Created task \([0-9]*\)\.$/\1/p')
 
 # New one has to be done first
 echo "$ID_OF_PARENT_TASK" will depend on "$NEW_TASK_ID"
