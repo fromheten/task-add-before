@@ -1,6 +1,5 @@
 #!/bin/sh
-set -ex
-set -o nounset
+set -e
 set -u
 
 # Requires jq, taskwarrior
@@ -9,15 +8,17 @@ set -u
 ID_OF_PARENT_TASK="$1"
 shift 1
 
+PARENT_TASK_JSON=$(task "$ID_OF_PARENT_TASK" export | jq '.[0]')
+
 # PARENT_TASK_PROJECT=$(task "$ID_OF_PARENT_TASK" info | grep "Project\ \ \ \ \ \ \ " | awk '{print $2}')
-PARENT_TASK_PROJECT=$(task "$ID_OF_PARENT_TASK" export | jq -r '.[0].project')
+PARENT_TASK_PROJECT=$(printf '%s' "$PARENT_TASK_JSON" | jq -r '.project')
 if [ -n "$PARENT_TASK_PROJECT" ]; then
   PARENT_TASK_PROJECT="project:$PARENT_TASK_PROJECT";
   else
   PARENT_TASK_PROJECT=""
 fi
 
-PARENT_TASK_due=$(task "$ID_OF_PARENT_TASK" export | jq -r '.[0].due')
+PARENT_TASK_due=$(printf '%s' "$PARENT_TASK_JSON" | jq -r '.due')
 if [ "$PARENT_TASK_due" != "null" ]; then
   PARENT_TASK_due="due:$PARENT_TASK_due";
   else
