@@ -36,6 +36,7 @@ echo "$NEW_TASK_CMDRESULT"
 
 # Created task 6. #example
 NEW_TASK_ID=$(printf '%s' "$NEW_TASK_CMDRESULT" | sed -n 's/^Created task \([0-9]*\)\.$/\1/p')
+[ -z "$NEW_TASK_ID" ] && { echo "Failed to extract new task ID from task add output" >&2; exit 1; }
 
 # New one has to be done first
 echo "$ID_OF_PARENT_TASK" will depend on "$NEW_TASK_ID"
