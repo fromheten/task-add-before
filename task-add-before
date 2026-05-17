@@ -5,6 +5,11 @@ set -u
 # Requires jq, taskwarrior
 # Example: `task-add-before 4 Do the preparations`
 
+if [ $# -lt 2 ]; then
+  echo "Usage: task-add-before <task-id> <description...>" >&2
+  exit 1
+fi
+
 ID_OF_PARENT_TASK="$1"
 shift 1
 
