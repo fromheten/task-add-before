@@ -31,6 +31,7 @@ fi
 
 NEW_TASK_DESCRIPTION="$*" # rest of arguments
 
+# shellcheck disable=SC2086
 NEW_TASK_CMDRESULT=$(task add $NEW_TASK_DESCRIPTION $PARENT_TASK_PROJECT $PARENT_TASK_due)
 echo "$NEW_TASK_CMDRESULT"
 
